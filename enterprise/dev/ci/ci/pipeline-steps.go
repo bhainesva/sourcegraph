@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"strings"
 
 	bk "github.com/sourcegraph/sourcegraph/internal/buildkite"
 )
@@ -223,27 +222,31 @@ func addCleanUpServerDockerImageCandidate(c Config) func(*bk.Pipeline) {
 // release", "release branch", "master branch", etc.)
 func addDockerImages(c Config) func(*bk.Pipeline) {
 	return func(pipeline *bk.Pipeline) {
-		switch {
-		case c.taggedRelease:
-			for _, dockerImage := range allDockerImages {
-				addDockerImage(c, dockerImage, false)(pipeline)
-			}
-			pipeline.AddWait()
-		case c.releaseBranch:
-			addDockerImage(c, "server", false)(pipeline)
-			pipeline.AddWait()
-		case strings.HasPrefix(c.branch, "master-dry-run/"): // replicates `master` build but does not deploy
-			fallthrough
-		case c.branch == "master":
-			for _, dockerImage := range allDockerImages {
-				addDockerImage(c, dockerImage, true)(pipeline)
-			}
-			pipeline.AddWait()
-
-		case strings.HasPrefix(c.branch, "docker-images-patch/"):
-			addDockerImage(c, c.branch[20:], false)(pipeline)
-			pipeline.AddWait()
+		for _, dockerImage := range allDockerImages {
+			addDockerImage(c, dockerImage, false)(pipeline)
 		}
+		pipeline.AddWait()
+		// switch {
+		// case c.taggedRelease:
+		// 	for _, dockerImage := range allDockerImages {
+		// 		addDockerImage(c, dockerImage, false)(pipeline)
+		// 	}
+		// 	pipeline.AddWait()
+		// case c.releaseBranch:
+		// 	addDockerImage(c, "server", false)(pipeline)
+		// 	pipeline.AddWait()
+		// case strings.HasPrefix(c.branch, "master-dry-run/"): // replicates `master` build but does not deploy
+		// 	fallthrough
+		// case c.branch == "master":
+		// 	for _, dockerImage := range allDockerImages {
+		// 		addDockerImage(c, dockerImage, true)(pipeline)
+		// 	}
+		// 	pipeline.AddWait()
+
+		// case strings.HasPrefix(c.branch, "docker-images-patch/"):
+		// 	addDockerImage(c, c.branch[20:], false)(pipeline)
+		// 	pipeline.AddWait()
+		// }
 	}
 }
 
@@ -310,31 +313,31 @@ func addDockerImage(c Config, app string, insiders bool) func(*bk.Pipeline) {
 
 		cmds = append(cmds, bk.Cmd("yes | gcloud auth configure-docker"))
 
-		dockerHubImage := dockerHubImageName(app)
+		// dockerHubImage := dockerHubImageName(app)
+		//
+		// for _, image := range []string{dockerHubImage, gcrImage} {
+		// 	if app != "server" || c.taggedRelease || c.patch || c.patchNoTest {
+		// 		cmds = append(cmds,
+		// 			bk.Cmd(fmt.Sprintf("docker pull %s:%s", gcrImage, c.version)),
+		// 			bk.Cmd(fmt.Sprintf("docker tag %s:%s %s:%s", gcrImage, c.version, image, c.version)),
+		// 			bk.Cmd(fmt.Sprintf("docker push %s:%s", image, c.version)),
+		// 		)
+		// 	}
 
-		for _, image := range []string{dockerHubImage, gcrImage} {
-			if app != "server" || c.taggedRelease || c.patch || c.patchNoTest {
-				cmds = append(cmds,
-					bk.Cmd(fmt.Sprintf("docker pull %s:%s", gcrImage, c.version)),
-					bk.Cmd(fmt.Sprintf("docker tag %s:%s %s:%s", gcrImage, c.version, image, c.version)),
-					bk.Cmd(fmt.Sprintf("docker push %s:%s", image, c.version)),
-				)
-			}
+		// 	if app == "server" && c.releaseBranch {
+		// 		cmds = append(cmds,
+		// 			bk.Cmd(fmt.Sprintf("docker tag %s:%s %s:%s-insiders", gcrImage, c.version, image, c.branch)),
+		// 			bk.Cmd(fmt.Sprintf("docker push %s:%s-insiders", image, c.branch)),
+		// 		)
+		// 	}
 
-			if app == "server" && c.releaseBranch {
-				cmds = append(cmds,
-					bk.Cmd(fmt.Sprintf("docker tag %s:%s %s:%s-insiders", gcrImage, c.version, image, c.branch)),
-					bk.Cmd(fmt.Sprintf("docker push %s:%s-insiders", image, c.branch)),
-				)
-			}
-
-			if insiders {
-				cmds = append(cmds,
-					bk.Cmd(fmt.Sprintf("docker tag %s:%s %s:insiders", gcrImage, c.version, image)),
-					bk.Cmd(fmt.Sprintf("docker push %s:insiders", image)),
-				)
-			}
-		}
+		// 	if insiders {
+		// 		cmds = append(cmds,
+		// 			bk.Cmd(fmt.Sprintf("docker tag %s:%s %s:insiders", gcrImage, c.version, image)),
+		// 			bk.Cmd(fmt.Sprintf("docker push %s:insiders", image)),
+		// 		)
+		// 	}
+		// }
 
 		pipeline.AddStep(":docker:", cmds...)
 	}
