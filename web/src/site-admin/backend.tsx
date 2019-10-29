@@ -585,3 +585,107 @@ export function fetchSiteUpdateCheck(): Observable<{
         map(data => data.site)
     )
 }
+
+/**
+ * Fetch counts of LSIF jobs by status.
+ */
+export function fetchLsifJobStatistics(): Observable<GQL.ILsifJobStats> {
+    return queryGraphQL(
+        gql`
+            query LsifJobStats {
+                lsifJobStats {
+                    id
+                    active
+                    queued
+                    scheduled
+                    completed
+                    failed
+                }
+            }
+        `
+    ).pipe(
+        map(dataOrThrowErrors),
+        map(data => data.lsifJobStats)
+    )
+}
+
+/**
+ * Fetch LSIF jobs with the given status.
+ *
+ * @param param0 Query parameters.
+ */
+export function fetchLsifJobs({
+    first,
+    after,
+    query,
+    status,
+}: {
+    /* The maximum number of results to return. */
+    first?: number
+    /* The endCursor from the previous page of results. */
+    after?: string | null
+    /* A search term to filter by. */
+    query?: string
+    /* The status. */
+    status?: string
+}): Observable<GQL.ILsifJobConnection> {
+    return queryGraphQL(
+        gql`
+            query LsifJobs($status: LSIFJobState!, $query: String, $first: Int, $after: ID) {
+                lsifJobs(status: $status, query: $query, first: $first, after: $after) {
+                    nodes {
+                        id
+                        name
+                        args
+                        status
+                        progress
+                        failedReason
+                        stacktrace
+                        timestamp
+                        processedOn
+                        finishedOn
+                    }
+                    totalCount
+                    pageInfo {
+                        endCursor
+                        hasNextPage
+                    }
+                }
+            }
+        `,
+        { status: status.toUpperCase(), query, first, after }
+    ).pipe(
+        map(dataOrThrowErrors),
+        map(data => data.lsifJobs)
+    )
+}
+
+/**
+ * Fetch a single LSIF job by id.
+ *
+ * @param id The job id.
+ */
+export function fetchLsifJob(id: string): Observable<GQL.ILsifJob | null> {
+    return queryGraphQL(
+        gql`
+            query LsifJob($id: ID!) {
+                lsifJob(id: $id) {
+                    id
+                    name
+                    args
+                    status
+                    progress
+                    failedReason
+                    stacktrace
+                    timestamp
+                    processedOn
+                    finishedOn
+                }
+            }
+        `,
+        { id }
+    ).pipe(
+        map(dataOrThrowErrors),
+        map(data => data.lsifJob)
+    )
+}
