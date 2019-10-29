@@ -1100,7 +1100,7 @@ type Query {
     lsifJob(id: ID!): LSIFJob
 
     # Search for LSIF jobs by status ad query term.
-    lsifJobs(first: Int, after: ID, status: LSIFJobState!, query: String): LSIFJobConnection!
+    lsifJobs(status: LSIFJobState!, query: String, first: Int, after: ID): LSIFJobConnection!
 }
 
 # The version of the search syntax.
