@@ -12,6 +12,7 @@ import { RepoHeaderContributionsLifecycleProps } from '../RepoHeader'
 import { RepoHeaderContributionPortal } from '../RepoHeaderContributionPortal'
 import { fetchRepository } from './backend'
 import { RepoSettingsIndexPage } from './RepoSettingsIndexPage'
+import { RepoSettingsLsifPage } from './RepoSettingsLsifPage'
 import { RepoSettingsMirrorPage } from './RepoSettingsMirrorPage'
 import { RepoSettingsOptionsPage } from './RepoSettingsOptionsPage'
 import { RepoSettingsSidebar } from './RepoSettingsSidebar'
@@ -127,6 +128,14 @@ export class RepoSettingsArea extends React.Component<Props> {
                             exact={true}
                             render={routeComponentProps => (
                                 <RepoSettingsIndexPage {...routeComponentProps} {...transferProps} />
+                            )}
+                        />
+                        <Route
+                            path={`${this.props.match.url}/lsif`}
+                            key="hardcoded-key" // see https://github.com/ReactTraining/react-router/issues/4578#issuecomment-334489490
+                            exact={true}
+                            render={routeComponentProps => (
+                                <RepoSettingsLsifPage {...routeComponentProps} {...transferProps} />
                             )}
                         />
                         <Route
