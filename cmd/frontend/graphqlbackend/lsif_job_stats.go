@@ -26,7 +26,7 @@ func lsifJobStatsByGQLID(ctx context.Context, id graphql.ID) (*lsifJobStatsResol
 	}
 
 	var stats *types.LSIFJobStats
-	if err := lsif.TraceRequestAndUnmarshalPayload(ctx, "/job/stats", nil, stats); err != nil {
+	if err := lsif.TraceRequestAndUnmarshalPayload(ctx, "/jobs/stats", nil, &stats); err != nil {
 		return nil, err
 	}
 
@@ -38,7 +38,6 @@ type lsifJobStatsResolver struct {
 }
 
 func (r *lsifJobStatsResolver) ID() graphql.ID {
-
 	return marshalLSIFJobStatsGQLID(singletonLSIFJobStatsGQLID)
 }
 
