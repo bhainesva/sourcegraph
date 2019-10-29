@@ -258,6 +258,7 @@ func addDockerImage(c Config, app string, insiders bool) func(*bk.Pipeline) {
 		cmds := []bk.StepOpt{
 			bk.Cmd(fmt.Sprintf(`echo "Building %s..."`, app)),
 			bk.Env("DOCKER_BUILDKIT", "1"),
+			bk.Cmd("yes | gcloud auth configure-docker"),
 		}
 
 		cmdDir := func() string {
@@ -310,8 +311,6 @@ func addDockerImage(c Config, app string, insiders bool) func(*bk.Pipeline) {
 		cmds = append(cmds,
 			getBuildSteps()...,
 		)
-
-		cmds = append(cmds, bk.Cmd("yes | gcloud auth configure-docker"))
 
 		// dockerHubImage := dockerHubImageName(app)
 		//
