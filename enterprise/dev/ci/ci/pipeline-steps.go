@@ -343,9 +343,9 @@ func addDockerImage(c Config, app string, insiders bool) func(*bk.Pipeline) {
 	}
 }
 
-func dockerHubImageName(app string) string {
-	return fmt.Sprintf("index.docker.io/sourcegraph/%s", app)
-}
+// func dockerHubImageName(app string) string {
+// 	return fmt.Sprintf("index.docker.io/sourcegraph/%s", app)
+// }
 
 func gcrImageName(app string) string {
 	return fmt.Sprintf("us.gcr.io/sourcegraph-dev/%s", app)
