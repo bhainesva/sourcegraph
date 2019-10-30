@@ -34,7 +34,7 @@ steps:
       - 'push'
       - '${_IMAGE}'
 tags:
-  - 'server'
+  - 'searcher'
   - '${_COMMIT_SHA}'
 images:
   - '${_IMAGE}'

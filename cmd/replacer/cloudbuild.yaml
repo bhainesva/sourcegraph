@@ -15,7 +15,7 @@ steps:
     args:
       - 'build'
 
-      - '--file=cmd/repo-updater/Dockerfile'
+      - '--file=cmd/replacer/Dockerfile'
       - '--tag=${_IMAGE}'
       - '.'
 
@@ -28,23 +28,19 @@ steps:
       - '--build-arg'
       - 'VERSION=${_VERSION}'
 
-      - '--build-arg'
-      - 'REPO_UPDATER_PKG=${_REPO_UPDATER_PKG}'
-
   - id: 'docker-push'
     name: 'gcr.io/cloud-builders/docker'
     args:
       - 'push'
       - '${_IMAGE}'
 tags:
-  - 'repo-updater'
+  - 'replacer'
   - '${_COMMIT_SHA}'
 images:
   - '${_IMAGE}'
 timeout: 1200s
 substitutions:
-  '_IMAGE': 'us.gcr.io/sourcegraph-dev/repo-updater:latest'
+  '_IMAGE': 'us.gcr.io/sourcegraph-dev/replacer:latest'
   '_COMMIT_SHA': 'unknown'
   '_DATE': 'unknown'
   '_VERSION': 'unknown'
-  '_REPO_UPDATER_PKG': 'github.com/sourcegraph/sourcegraph/cmd/repo-updater'
